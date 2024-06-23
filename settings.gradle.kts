@@ -1,1 +1,1 @@
-rootProject.name = "com.example.idp-ktor"
+rootProject.name = "com.marblet.idp-ktor"
