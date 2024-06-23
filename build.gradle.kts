@@ -4,6 +4,7 @@ val logback_version: String by project
 val exposed_version: String by project
 val h2_version: String by project
 val detekt_version: String by project
+val kotest_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -41,9 +42,20 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("io.kotest:kotest-assertions-core:$kotest_version")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotest_version")
+    testImplementation("io.kotest:kotest-framework-datatest:$kotest_version")
+    testImplementation("io.kotest.extensions:kotest-assertions-arrow:1.4.0")
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_version")
+
+    implementation("io.arrow-kt:arrow-core:1.2.4")
 }
 
 detekt {
     autoCorrect = true
+    buildUponDefaultConfig = true
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
