@@ -1,0 +1,8 @@
+complexity:
+  LongParameterList:
+    active: false
+style:
+  ReturnCount:
+    active: false
+  ForbiddenComment:
+    active: false
