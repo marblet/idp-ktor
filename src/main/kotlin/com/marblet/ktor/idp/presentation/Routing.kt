@@ -1,7 +1,5 @@
 package com.marblet.ktor.idp.presentation
 
-import com.marblet.ktor.idp.domain.model.ClientId
-import com.marblet.ktor.idp.infrastructure.repository.ClientRepositoryImpl
 import com.marblet.ktor.idp.presentation.response.TokenResponse
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
@@ -16,8 +14,6 @@ import io.ktor.server.routing.routing
 fun Application.configureRouting() {
     routing {
         get("/authorize") {
-            val client = ClientRepositoryImpl().get(ClientId("test"))
-            print(client)
             call.respondRedirect("/consent")
         }
         get("/consent") {

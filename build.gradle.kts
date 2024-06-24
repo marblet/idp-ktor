@@ -5,6 +5,7 @@ val exposed_version: String by project
 val h2_version: String by project
 val detekt_version: String by project
 val kotest_version: String by project
+val koin_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -45,6 +46,9 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
     implementation("mysql:mysql-connector-java:8.0.33")
+
+    // Koin (DI)
+    implementation("io.insert-koin:koin-ktor:$koin_version")
 
     // testing
     testImplementation("io.ktor:ktor-server-tests-jvm")
