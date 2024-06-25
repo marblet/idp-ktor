@@ -47,6 +47,10 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
     implementation("mysql:mysql-connector-java:8.0.33")
 
+    // password hashing
+    implementation("org.springframework.security:spring-security-crypto:6.0.3")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.77")
+
     // Koin (DI)
     implementation("io.insert-koin:koin-ktor:$koin_version")
 
