@@ -1,0 +1,56 @@
+package com.marblet.ktor.idp.application
+
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import com.marblet.ktor.idp.application.GetUserInfoUseCase.Error.InsufficientScope
+import com.marblet.ktor.idp.application.GetUserInfoUseCase.Error.InvalidToken
+import com.marblet.ktor.idp.application.GetUserInfoUseCase.Error.UserNotFound
+import com.marblet.ktor.idp.domain.model.UserInfoError
+import com.marblet.ktor.idp.domain.model.UserInfoError.INSUFFICIENT_SCOPE
+import com.marblet.ktor.idp.domain.model.UserInfoError.INVALID_REQUEST
+import com.marblet.ktor.idp.domain.model.UserInfoError.INVALID_TOKEN
+import com.marblet.ktor.idp.domain.model.UserInfoRequestScopes
+import com.marblet.ktor.idp.domain.repository.UserInfoRepository
+import com.marblet.ktor.idp.domain.service.AccessTokenConverter
+
+class GetUserInfoUseCase(
+    private val accessTokenConverter: AccessTokenConverter,
+    private val userInfoRepository: UserInfoRepository,
+) {
+    fun run(authorizationHeader: String): Either<Error, Response> {
+        if (!authorizationHeader.startsWith("Bearer ") && !authorizationHeader.startsWith("bearer ")) {
+            return InvalidToken.left()
+        }
+        val accessToken = authorizationHeader.substring(7)
+        val accessTokenPayload = accessTokenConverter.decode(accessToken) ?: return InvalidToken.left()
+        if (!accessTokenPayload.scopes.hasOpenidScope()) return InsufficientScope.left()
+        val userInfoRequestScopes = UserInfoRequestScopes.generate(accessTokenPayload.scopes)
+            ?: UserInfoRequestScopes(setOf())
+        val userInfo = userInfoRepository.get(accessTokenPayload.userId) ?: return UserNotFound.left()
+        val userInfoResponse = userInfo.toUserInfoResponse(userInfoRequestScopes)
+        return Response(
+            sub = userInfoResponse.sub,
+            name = userInfoResponse.name,
+            email = userInfoResponse.email,
+            phoneNumber = userInfoResponse.phoneNumber,
+            address = userInfoResponse.address,
+        ).right()
+    }
+
+    data class Response(
+        val sub: String,
+        val name: String?,
+        val email: String?,
+        val phoneNumber: String?,
+        val address: String?
+    )
+
+    sealed class Error(val error: UserInfoError, val description: String) {
+        data object InvalidToken : Error(INVALID_TOKEN, "invalid token")
+
+        data object InsufficientScope : Error(INSUFFICIENT_SCOPE, "insufficient scope")
+
+        data object UserNotFound : Error(INVALID_REQUEST, "user not found")
+    }
+}

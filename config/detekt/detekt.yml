@@ -1,6 +1,10 @@
 complexity:
   LongParameterList:
     active: false
+  LongMethod:
+    active: false
+  CyclomaticComplexMethod:
+    threshold: 20
 style:
   ReturnCount:
     active: false
